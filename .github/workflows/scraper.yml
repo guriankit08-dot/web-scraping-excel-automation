@@ -1,0 +1,36 @@
+name: Automatic Web Scraping
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 3 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install libraries
+        run: pip install -r requirements.txt
+
+      - name: Run scraper
+        run: python scraper.py
+
+      - name: Upload Excel file
+        uses: actions/upload-artifact@v4
+        with:
+          name: scraped-excel-data
+          path: data/products.xlsx
+          if-no-files-found: error
+          retention-days: 7
